@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>بوصلة المستقبل</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Reem+Kufi:wght@400;500;600;700&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#12142b;
+    --bg-elevated:#1b1f42;
+    --bg-card:#1f2449;
+    --accent-gold:#f2a93b;
+    --accent-gold-soft:rgba(242,169,59,0.16);
+    --accent-teal:#5fd9c4;
+    --danger:#ef6f7a;
+    --danger-soft:rgba(239,111,122,0.12);
+    --text-primary:#f4efe3;
+    --text-muted:#9199c2;
+    --border:rgba(242,169,59,0.2);
+    --radius-lg:22px;
+    --radius-md:14px;
+  }
+
+  *{box-sizing:border-box;}
+
+  html,body{
+    margin:0;
+    padding:0;
+    background:var(--bg);
+    color:var(--text-primary);
+    font-family:'IBM Plex Sans Arabic', sans-serif;
+    min-height:100%;
+  }
+
+  body{
+    position:relative;
+    overflow-x:hidden;
+    background:
+      radial-gradient(circle at 50% -10%, rgba(242,169,59,0.10), transparent 55%),
+      radial-gradient(circle at 90% 100%, rgba(95,217,196,0.06), transparent 45%),
+      var(--bg);
+  }
+
+  body::before{
+    content:"";
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    background-image:
+      repeating-linear-gradient(0deg, rgba(255,255,255,0.025) 0px, rgba(255,255,255,0.025) 1px, transparent 1px, transparent 80px),
+      repeating-linear-gradient(90deg, rgba(255,255,255,0.025) 0px, rgba(255,255,255,0.025) 1px, transparent 1px, transparent 80px);
+    z-index:0;
+  }
+
+  .wrap{
+    position:relative;
+    z-index:1;
+    max-width:520px;
+    margin:0 auto;
+    padding:56px 20px 80px;
+  }
+
+  .eyebrow{
+    font-family:'Reem Kufi', sans-serif;
+    font-size:14px;
+    letter-spacing:0.08em;
+    color:var(--accent-gold);
+    text-align:center;
+    margin:0 0 10px;
+  }
+
+  h1{
+    font-family:'Reem Kufi', sans-serif;
+    font-weight:700;
+    font-size:42px;
+    text-align:center;
+    margin:0 0 12px;
+    color:var(--text-primary);
+    letter-spacing:0.01em;
+  }
+
+  .tagline{
+    text-align:center;
+    color:var(--text-muted);
+    font-size:16px;
+    line-height:1.7;
+    max-width:380px;
+    margin:0 auto 36px;
+  }
+
+  /* ===== Compass ===== */
+  .compass-zone{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    margin-bottom:40px;
+  }
+
+  .compass-wrap{
+    position:relative;
+    width:220px;
+    height:220px;
+  }
+
+  .compass-ring{
+    width:100%;
+    height:100%;
+    filter: drop-shadow(0 0 24px rgba(242,169,59,0.12));
+  }
+
+  .compass-wrap.error .compass-ring{
+    filter: drop-shadow(0 0 24px rgba(239,111,122,0.22));
+  }
+
+  .compass-outer{
+    stroke:var(--border);
+    transition:stroke 0.6s ease;
+  }
+  .compass-wrap.error .compass-outer{
+    stroke:rgba(239,111,122,0.45);
+  }
+
+  .compass-tick{
+    stroke:var(--text-muted);
+    stroke-width:1.5;
+  }
+
+  .compass-label{
+    fill:var(--text-muted);
+    font-family:'IBM Plex Sans Arabic', sans-serif;
+    font-size:11px;
+  }
+
+  .needle{
+    transform-origin:110px 110px;
+    transform:rotate(0deg);
+  }
+  .needle-north{ fill:var(--accent-gold); }
+  .needle-south{ fill:#3a3f6b; }
+
+  .compass-wrap.idle .needle{
+    animation: drift 4.5s ease-in-out infinite;
+  }
+  .compass-wrap.loading .needle{
+    animation: spin 0.9s linear infinite;
+  }
+  .compass-wrap.result .needle{
+    animation:none;
+    transition: transform 1.3s cubic-bezier(.28,1.55,.55,1);
+  }
+  .compass-wrap.error .needle{
+    animation:none;
+    transition: transform 0.5s ease;
+    transform: rotate(0deg);
+  }
+
+  @keyframes drift{
+    0%,100%{ transform:rotate(-7deg); }
+    50%{ transform:rotate(7deg); }
+  }
+  @keyframes spin{
+    from{ transform:rotate(0deg); }
+    to{ transform:rotate(360deg); }
+  }
+
+  .status-line{
+    margin-top:16px;
+    font-size:14px;
+    color:var(--text-muted);
+    text-align:center;
+    min-height:20px;
+  }
+
+  /* ===== Card / form ===== */
+  .card{
+    background:var(--bg-card);
+    border:1px solid rgba(255,255,255,0.06);
+    border-radius:var(--radius-lg);
+    padding:26px;
+    box-shadow:0 20px 40px rgba(0,0,0,0.25);
+  }
+
+  label{
+    display:block;
+    font-size:13px;
+    color:var(--text-muted);
+    margin-bottom:8px;
+  }
+
+  .field{
+    margin-bottom:18px;
+  }
+
+  input[type="text"],
+  input[type="number"]{
+    width:100%;
+    background:var(--bg-elevated);
+    border:1px solid rgba(255,255,255,0.08);
+    border-radius:var(--radius-md);
+    padding:14px 16px;
+    color:var(--text-primary);
+    font-family:inherit;
+    font-size:15px;
+    transition:border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  input::placeholder{ color:#5c628c; }
+
+  input:focus-visible{
+    outline:none;
+    border-color:var(--accent-gold);
+    box-shadow:0 0 0 3px var(--accent-gold-soft);
+  }
+
+  button[type="submit"]{
+    width:100%;
+    border:none;
+    border-radius:var(--radius-md);
+    padding:15px 18px;
+    background:var(--accent-gold);
+    color:#241505;
+    font-family:'IBM Plex Sans Arabic', sans-serif;
+    font-weight:600;
+    font-size:16px;
+    cursor:pointer;
+    transition:transform 0.15s ease, opacity 0.15s ease, background 0.2s ease;
+  }
+
+  button[type="submit"]:hover{ transform:translateY(-1px); }
+  button[type="submit"]:active{ transform:translateY(0); }
+  button[type="submit"]:disabled{
+    opacity:0.6;
+    cursor:default;
+    transform:none;
+  }
+
+  button[type="submit"]:focus-visible{
+    outline:2px solid var(--accent-teal);
+    outline-offset:3px;
+  }
+
+  /* ===== Result / error ===== */
+  .panel{
+    margin-top:20px;
+    border-radius:var(--radius-md);
+    padding:18px 20px;
+    display:none;
+    line-height:1.8;
+    font-size:15px;
+  }
+
+  .panel.show{ display:block; }
+
+  .panel.error{
+    background:var(--danger-soft);
+    border-inline-start:3px solid var(--danger);
+    color:#ffd6da;
+  }
+
+  .panel.result{
+    background:var(--bg-elevated);
+    border-inline-start:3px solid var(--accent-teal);
+  }
+
+  .panel.result .panel-title{
+    font-family:'Reem Kufi', sans-serif;
+    font-size:16px;
+    color:var(--accent-teal);
+    margin:0 0 10px;
+  }
+
+  .panel.result .panel-body{
+    color:var(--text-primary);
+    white-space:pre-line;
+  }
+
+  .footnote{
+    text-align:center;
+    color:#5c628c;
+    font-size:12px;
+    margin-top:26px;
+  }
+
+  @media (max-width:400px){
+    h1{ font-size:34px; }
+    .compass-wrap{ width:180px; height:180px; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .compass-wrap.idle .needle{ animation:none; }
+    .compass-wrap.loading .needle{ animation:none; opacity:0.6; }
+    .compass-wrap.result .needle,
+    .compass-wrap.error .needle{ transition:none; }
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <p class="eyebrow">بالذكاء الاصطناعي</p>
+    <h1>بوصلة المستقبل</h1>
+    <p class="tagline">قول لنا هوايتك وسنك، والبوصلة هتدلّك على مهنة تناسبك</p>
+
+    <div class="compass-zone">
+      <div class="compass-wrap idle" id="compassWrap">
+        <svg class="compass-ring" viewBox="0 0 220 220">
+          <circle class="compass-outer" cx="110" cy="110" r="95" fill="none" stroke-width="1.5"/>
+          <circle cx="110" cy="110" r="80" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+          <!-- ticks -->
+          <g class="compass-tick">
+            <line x1="110" y1="18" x2="110" y2="30"/>
+            <line x1="110" y1="190" x2="110" y2="202"/>
+            <line x1="18" y1="110" x2="30" y2="110"/>
+            <line x1="190" y1="110" x2="202" y2="110"/>
+          </g>
+          <text class="compass-label" x="110" y="15" text-anchor="middle">شمال</text>
+          <text class="compass-label" x="110" y="212" text-anchor="middle">جنوب</text>
+          <text class="compass-label" x="208" y="114" text-anchor="start">شرق</text>
+          <text class="compass-label" x="12" y="114" text-anchor="end">غرب</text>
+
+          <g class="needle" id="needle">
+            <polygon class="needle-north" points="110,42 100,110 110,110 120,110"/>
+            <polygon class="needle-south" points="110,178 100,110 110,110 120,110"/>
+          </g>
+          <circle cx="110" cy="110" r="6" fill="var(--accent-gold)"/>
+        </svg>
+      </div>
+      <p class="status-line" id="statusLine">جاهزة تدلّك على اتجاهك</p>
+    </div>
+
+    <form class="card" id="compassForm">
+      <div class="field">
+        <label for="hobby">الهواية المفضلة</label>
+        <input type="text" id="hobby" name="hobby" placeholder="مثال: الرسم، البرمجة، كرة القدم..." autocomplete="off">
+      </div>
+      <div class="field">
+        <label for="age">السن</label>
+        <input type="number" id="age" name="age" placeholder="لازم يكون 16 سنة أو أكتر" inputmode="numeric">
+      </div>
+      <button type="submit" id="submitBtn">اكتشف اتجاهك</button>
+
+      <div class="panel error" id="errorPanel"></div>
+      <div class="panel result" id="resultPanel">
+        <p class="panel-title">المهنة المقترحة لك</p>
+        <p class="panel-body" id="resultBody"></p>
+      </div>
+    </form>
+
+    <p class="footnote">الاقتراح مبني على الذكاء الاصطناعي، استخدمه كنقطة بداية للتفكير مش كقرار نهائي.</p>
+  </div>
+
+<script>
+  // ============================================================
+  // إعدادات الـ AI (OpenRouter)
+  // تنبيه أمان: المفتاح هنا ظاهر لأي حد يفتح "عرض المصدر" على
+  // الصفحة. مقبول للتجربة الشخصية، لكن لو الموقع هينشر للجمهور
+  // الأفضل ينتقل الاتصال بالـ API لسيرفر بسيط بدل ما يكون المفتاح
+  // داخل صفحة الويب مباشرة.
+  // ============================================================
+  const API_KEY = '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';
+  const API_URL = 'https://openrouter.ai/api/v1/chat/completions';
+  const MODEL = 'openai/gpt-oss-20b';
+  const MIN_AGE = 16;
+
+  const form = document.getElementById('compassForm');
+  const hobbyInput = document.getElementById('hobby');
+  const ageInput = document.getElementById('age');
+  const submitBtn = document.getElementById('submitBtn');
+  const compassWrap = document.getElementById('compassWrap');
+  const needle = document.getElementById('needle');
+  const statusLine = document.getElementById('statusLine');
+  const errorPanel = document.getElementById('errorPanel');
+  const resultPanel = document.getElementById('resultPanel');
+  const resultBody = document.getElementById('resultBody');
+
+  function setState(state){
+    compassWrap.classList.remove('idle','loading','result','error');
+    compassWrap.classList.add(state);
+  }
+
+  function showError(message){
+    setState('error');
+    statusLine.textContent = 'مفيش اتجاه واضح دلوقتي';
+    errorPanel.textContent = message;
+    errorPanel.classList.add('show');
+    resultPanel.classList.remove('show');
+  }
+
+  function showResult(text){
+    // زاوية استقرار مميزة لكل نتيجة، بناءً على محتوى الرد
+    let hash = 0;
+    for (let i=0;i<text.length;i++){ hash = (hash + text.charCodeAt(i)) % 140; }
+    const angle = hash - 70;
+    needle.style.transform = `rotate(${angle}deg)`;
+
+    setState('result');
+    statusLine.textContent = 'لقينا اتجاهك 👇';
+    resultBody.textContent = text;
+    resultPanel.classList.add('show');
+    errorPanel.classList.remove('show');
+  }
+
+  function resetPanels(){
+    errorPanel.classList.remove('show');
+    resultPanel.classList.remove('show');
+  }
+
+  form.addEventListener('submit', async function(e){
+    e.preventDefault();
+    resetPanels();
+
+    const hobby = hobbyInput.value.trim();
+    const ageRaw = ageInput.value.trim();
+
+    if (!hobby){
+      showError('من فضلك اكتب هوايتك المفضلة.');
+      return;
+    }
+
+    const age = parseInt(ageRaw, 10);
+    if (isNaN(age)){
+      showError('من فضلك اكتب سن صحيح (أرقام فقط).');
+      return;
+    }
+    if (age < MIN_AGE){
+      showError(`لازم يكون عمرك ${MIN_AGE} سنة أو أكتر عشان تقدر تستخدم البوصلة.`);
+      return;
+    }
+
+    setState('loading');
+    statusLine.textContent = 'بندوّر على اتجاهك...';
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'جاري التفكير...';
+
+    try{
+      const response = await fetch(API_URL, {
+        method:'POST',
+        headers:{
+          'Authorization': 'Bearer ' + API_KEY,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          model: MODEL,
+          messages: [
+            {
+              role:'system',
+              content:'أنت مستشار مهني خبير باللغة العربية. مهمتك اقتراح مهنة أو مسار مهني مناسب للشخص بناءً على هوايته المفضلة وسنه، مع شرح مختصر (3-4 جمل) ليه المهنة دي مناسبة له، وممكن تقترح خطوة عملية أولى يبدأ بيها. خلي الأسلوب ودود ومشجع.'
+            },
+            {
+              role:'user',
+              content:`الهواية المفضلة عندي: ${hobby}\nسني: ${age} سنة\nما هي المهنة المناسبة لي؟`
+            }
+          ]
+        })
+      });
+
+      if (response.ok){
+        const data = await response.json();
+        const content = data?.choices?.[0]?.message?.content?.trim();
+        showResult(content || 'لم يتم استلام رد من الذكاء الاصطناعي.');
+      } else {
+        showError(`حدث خطأ من الخادم (كود ${response.status}). حاول مرة أخرى.`);
+      }
+    } catch(err){
+      showError('تعذر الاتصال بخدمة الذكاء الاصطناعي. تأكد من اتصالك بالإنترنت وحاول تاني.');
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'اكتشف اتجاهك';
+    }
+  });
+</script>
+</body>
+</html>
